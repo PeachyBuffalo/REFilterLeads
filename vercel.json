@@ -2,9 +2,22 @@
   "version": 2,
   "buildCommand": "npm install && npm run build",
   "outputDirectory": "static",
-  "python": {
-    "version": "3.12"
-  },
+  "builds": [
+    {
+      "src": "free_api/api/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "pythonVersion": "3.12"
+      }
+    },
+    {
+      "src": "forewarn/api/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "pythonVersion": "3.12"
+      }
+    }
+  ],
   "routes": [
     {
       "src": "/static/(.*)",
