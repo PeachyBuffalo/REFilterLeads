@@ -1,10 +1,11 @@
 {
-  "name": "lead-verification-ui",
+  "name": "lead-verification-system",
   "version": "1.0.0",
-  "description": "Lead Verification UI",
+  "description": "Lead Verification System Frontend",
   "scripts": {
-    "build": "tsc && mkdir -p static/js && cp -r src/*.html static/ && cp -r src/types.ts static/js/",
-    "watch": "tsc -w"
+    "build": "tsc && mkdir -p static/js && cp src/*.html static/ && cp dist/*.js static/js/",
+    "watch": "tsc -w",
+    "vercel-build": "npm install && npm run build"
   },
   "dependencies": {
     "chart.js": "^4.4.1"

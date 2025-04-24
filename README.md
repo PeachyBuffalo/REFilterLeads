@@ -157,4 +157,62 @@ The system exports verified and flagged leads to separate JSON files with this s
 - Ensure compliance with data privacy regulations (e.g., GDPR, CCPA) when handling personal data
 - Monitor API usage to manage costs, especially for APIs with per-call pricing
 - Consider implementing rate limiting for API calls
-- Keep your API keys secure and never commit them to version control 
+- Keep your API keys secure and never commit them to version control
+
+# Lead Verification System
+
+A web-based lead verification system with a TypeScript frontend and Python backend.
+
+## Setup
+
+1. Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+2. Install Node.js dependencies:
+```bash
+npm install
+```
+
+3. Build the TypeScript frontend:
+```bash
+npm run build
+```
+
+4. Run the Flask application:
+```bash
+python app.py
+```
+
+The application will be available at `http://localhost:5000`.
+
+## Development
+
+- Frontend TypeScript files are in the `src` directory
+- Compiled JavaScript files are output to `dist` directory
+- Static files (HTML, JS) are served from the `static` directory
+- Python backend code is in the root directory
+
+To watch for TypeScript changes during development:
+```bash
+npm run watch
+```
+
+## Project Structure
+
+```
+.
+├── src/                    # TypeScript source files
+│   ├── main.ts            # Main application logic
+│   ├── types.ts           # TypeScript type definitions
+│   └── index.html         # Main HTML template
+├── static/                # Static files served by Flask
+│   ├── js/               # Compiled JavaScript
+│   └── index.html        # Copied from src/
+├── dist/                  # TypeScript compilation output
+├── app.py                # Flask application
+├── requirements.txt      # Python dependencies
+├── package.json         # Node.js dependencies
+└── tsconfig.json        # TypeScript configuration
+``` 

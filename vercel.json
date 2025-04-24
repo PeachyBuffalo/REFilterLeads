@@ -4,17 +4,14 @@
   "outputDirectory": "static",
   "builds": [
     {
-      "src": "free_api/api/*.py",
-      "use": "@vercel/python",
-      "config": {
-        "pythonVersion": "3.12"
-      }
+      "src": "app.py",
+      "use": "@vercel/python"
     },
     {
-      "src": "forewarn/api/*.py",
-      "use": "@vercel/python",
+      "src": "package.json",
+      "use": "@vercel/static-build",
       "config": {
-        "pythonVersion": "3.12"
+        "distDir": "static"
       }
     }
   ],
@@ -24,23 +21,16 @@
       "dest": "/static/$1"
     },
     {
-      "src": "/free-api/(.*)",
-      "dest": "/free_api/api/$1"
-    },
-    {
-      "src": "/forewarn/(.*)",
-      "dest": "/forewarn/api/$1"
-    },
-    {
       "src": "/api/(.*)",
-      "dest": "/free_api/api/$1"
+      "dest": "/app.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/static/index.html"
     }
   ],
   "env": {
     "PYTHONPATH": "."
-  }
+  },
+  "installCommand": "pip install --upgrade pip setuptools wheel && pip install --only-binary :all: -r requirements.txt"
 }
