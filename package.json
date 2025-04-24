@@ -1,0 +1,16 @@
+{
+  "name": "lead-verification-ui",
+  "version": "1.0.0",
+  "description": "Lead Verification UI",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/chart.js": "^2.9.41"
+  }
+} 
