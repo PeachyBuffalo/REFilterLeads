@@ -6,7 +6,7 @@ class TestLeadVerification(unittest.TestCase):
     def setUp(self):
         self.verifier = LeadVerifier()
         
-    @patch('free_lead_verification.requests.get')
+    @patch('free_api.free_lead_verification.requests.get')
     def test_verify_phone_success(self, mock_get):
         # Mock successful phone verification
         mock_response = MagicMock()
@@ -28,7 +28,7 @@ class TestLeadVerification(unittest.TestCase):
         self.assertTrue(result["valid"])
         self.assertEqual(result["number"], "1234567890")
         
-    @patch('free_lead_verification.requests.post')
+    @patch('free_api.free_lead_verification.requests.post')
     def test_verify_email_success(self, mock_post):
         # Mock successful email verification
         mock_response = MagicMock()
@@ -44,7 +44,7 @@ class TestLeadVerification(unittest.TestCase):
         result = self.verifier.verify_email("test@example.com")
         self.assertEqual(result["result"], "valid")
         
-    @patch('free_lead_verification.requests.get')
+    @patch('free_api.free_lead_verification.requests.get')
     def test_check_background_success(self, mock_get):
         # Mock successful background check
         mock_response = MagicMock()
@@ -68,7 +68,7 @@ class TestLeadVerification(unittest.TestCase):
             ("Invalid Lead", "0000000000", "invalid@email")
         ]
         
-        with patch('free_lead_verification.LeadVerifier') as mock_verifier:
+        with patch('free_api.free_lead_verification.LeadVerifier') as mock_verifier:
             mock_instance = mock_verifier.return_value
             mock_instance.verify_lead.side_effect = [
                 {

@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "free_api/api/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "distDir": "free_api/api"
+      }
+    },
+    {
+      "src": "forewarn/api/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "distDir": "forewarn/api"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/free-api/(.*)",
+      "dest": "/free_api/api/$1"
+    },
+    {
+      "src": "/forewarn/(.*)",
+      "dest": "/forewarn/api/$1"
+    }
+  ],
+  "env": {
+    "PYTHONPATH": "."
+  }
+} 

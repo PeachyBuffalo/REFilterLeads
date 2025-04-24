@@ -1,3 +1,62 @@
+# REFilterLeads
+
+This project provides two different implementations for lead verification:
+
+## Directory Structure
+
+```
+REFilterLeads/
+├── free_api/              # Free API Implementation
+│   ├── free_lead_verification.py
+│   ├── test_numverify.py
+│   ├── test_free_verification.py
+│   ├── sample_leads.csv
+│   └── sample.env
+│
+└── forewarn/             # Forewarn API Implementation
+    ├── lead_verification.py
+    ├── lead_utils.py
+    ├── mock_forewarn_api.py
+    ├── test_lead_verification.py
+    └── Project Guide for Forewarn API Integration.markdown
+```
+
+## Free API Implementation
+
+Located in the `free_api` directory, this implementation uses free APIs for lead verification:
+- Numverify for phone verification
+- NeverBounce for email verification
+- Searchbug for background checks
+
+### Setup
+1. Copy `sample.env` to `.env` and add your API keys
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run tests: 
+   - `python test_numverify.py` for API testing
+   - `python test_free_verification.py` for unit tests
+
+## Forewarn Implementation
+
+Located in the `forewarn` directory, this implementation uses the Forewarn API for comprehensive lead verification.
+
+### Setup
+1. Follow the instructions in the Project Guide
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run tests: `python test_lead_verification.py`
+
+## Requirements
+
+Both implementations require:
+- Python 3.6+
+- requests
+- python-dotenv
+- pytest (for testing)
+
+Install all requirements:
+```bash
+pip install -r requirements.txt
+```
+
 # REFilterLeads - Real Estate Lead Verification System
 
 A system for verifying real estate leads using free APIs (Numverify, NeverBounce, and Searchbug) to validate contact information and perform basic background checks.

@@ -19,22 +19,23 @@ logger = logging.getLogger(__name__)
 # API Configuration
 NUMVERIFY_API_KEY = os.getenv("NUMVERIFY_API_KEY")
 NEVERBOUNCE_API_KEY = os.getenv("NEVERBOUNCE_API_KEY")
-SEARCHBUG_API_KEY = os.getenv("SEARCHBUG_API_KEY")
+MICROBILT_API_KEY = os.getenv("MICROBILT_API_KEY")
+
 
 class LeadVerifier:
     def __init__(self):
         """Initialize the lead verifier with API keys"""
         self.numverify_url = "http://apilayer.net/api/validate"
         self.neverbounce_url = "https://api.neverbounce.com/v4/single/check"
-        self.searchbug_url = "https://api.searchbug.com/api/people/search"
+        self.microbilt_url = "https://api.microbilt.com/v1/person/search"
         
         # Verify API keys are set
         if not NUMVERIFY_API_KEY:
             logger.warning("NUMVERIFY_API_KEY not found in environment variables")
         if not NEVERBOUNCE_API_KEY:
             logger.warning("NEVERBOUNCE_API_KEY not found in environment variables")
-        if not SEARCHBUG_API_KEY:
-            logger.warning("SEARCHBUG_API_KEY not found in environment variables")
+        if not MICROBILT_API_KEY:
+            logger.warning("MICROBILT_API_KEY not found in environment variables")
 
     def verify_phone(self, phone_number: str) -> Dict:
         """Verify phone number using Numverify API"""
@@ -90,25 +91,38 @@ class LeadVerifier:
             return {"result": "invalid", "error": str(e)}
 
     def check_background(self, name: str, phone: str, email: str) -> Dict:
-        """Check background information using Searchbug API"""
-        if not SEARCHBUG_API_KEY:
-            return {"error": "Searchbug API key not configured"}
+        """Check background information using MicroBilt API"""
+        if not MICROBILT_API_KEY:
+            logger.warning("MicroBilt API key not configured")
+            return {"error": "MicroBilt API key not configured"}
             
-        params = {
-            "api_key": SEARCHBUG_API_KEY,
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {MICROBILT_API_KEY}"
+        }
+        
+        data = {
             "name": name,
             "phone": phone,
             "email": email,
-            "format": "json"
+            "include_risk_factors": True,
+            "include_address_history": True
         }
         
         try:
-            # Disable SSL verification for Searchbug API
-            response = requests.get(self.searchbug_url, params=params, verify=False)
+            response = requests.post(self.microbilt_url, headers=headers, json=data)
             response.raise_for_status()
-            return response.json()
+            result = response.json()
+            
+            return {
+                "name": result.get("name"),
+                "addresses": result.get("addresses", []),
+                "risk_factors": result.get("risk_factors", []),
+                "criminal_records": result.get("criminal_records", []),
+                "bankruptcies": result.get("bankruptcies", [])
+            }
         except requests.exceptions.RequestException as e:
-            logger.error(f"Error checking background: {e}")
+            logger.error(f"Error checking background with MicroBilt: {e}")
             return {"error": str(e)}
 
     def verify_lead(self, name: str, phone: str, email: str) -> Dict:
@@ -137,6 +151,8 @@ class LeadVerifier:
                 risk_factors.append("criminal_records")
             if background_data.get("bankruptcies"):
                 risk_factors.append("bankruptcies")
+            if background_data.get("risk_factors"):
+                risk_factors.extend(background_data["risk_factors"])
         
         results["verification_status"] = {
             "overall_status": "verified" if phone_valid and email_valid and not risk_factors else "flagged",
