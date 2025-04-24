@@ -26,12 +26,12 @@
       "dest": "/forewarn/api/$1"
     },
     {
-      "src": "/",
+      "src": "/(.*)",
       "dest": "/free_api/api/index.py"
     }
   ],
   "env": {
     "PYTHONPATH": "."
   },
-  "installCommand": "pip install -r requirements.txt"
+  "installCommand": "pip install --upgrade pip setuptools wheel && pip install -r requirements.txt"
 }
