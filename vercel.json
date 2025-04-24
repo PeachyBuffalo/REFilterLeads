@@ -5,14 +5,14 @@
       "src": "free_api/api/*.py",
       "use": "@vercel/python",
       "config": {
-        "pythonVersion": "3.11"
+        "pythonVersion": "3.10"
       }
     },
     {
       "src": "forewarn/api/*.py",
       "use": "@vercel/python",
       "config": {
-        "pythonVersion": "3.11"
+        "pythonVersion": "3.10"
       }
     }
   ],
