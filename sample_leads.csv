@@ -1,11 +1,11 @@
-Full Name,Phone Number,Email,Source
-John Doe,123-456-7890,john.doe@example.com,Website Form
-Jane Smith,987-654-3210,jane.smith@example.com,Zillow
-Bob Johnson,555-123-4567,bob.johnson@example.com,Referral
-Maria Garcia,333-222-1111,maria.garcia@example.com,Open House
-James Wilson,444-555-6666,james.wilson@example.com,Facebook Ad
-Susan Brown,777-888-9999,susan.brown@example.com,Email Campaign
-Peter Zhang,111-222-3333,peter.zhang@example.com,Instagram
-Mary Johnson,999-888-7777,mary.johnson@example.com,Website Form
-Robert Smith,555-444-3333,robert.smith@example.com,Zillow
-Sarah Lee,222-333-4444,sarah.lee@example.com,Referral 
+name,phone,email,source
+John Smith,6164036921,john.smith@example.com,Website Form
+Sarah Johnson,4155551234,sarah.j@example.com,Zillow
+Michael Brown,2125556789,michael.b@example.com,Referral
+Emily Davis,3105554321,emily.d@example.com,Open House
+Robert Wilson,6175558765,robert.w@example.com,Facebook Ad
+Jennifer Lee,4085553456,jennifer.l@example.com,Email Campaign
+David Miller,3125557890,david.m@example.com,Instagram
+Lisa Anderson,2135552345,lisa.a@example.com,Website Form
+James Taylor,4155556789,james.t@example.com,Zillow
+Patricia Moore,2125554321,patricia.m@example.com,Referral 
