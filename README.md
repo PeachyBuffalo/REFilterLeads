@@ -1,87 +1,115 @@
+# REFilterLeads
+
+This project provides two different implementations for lead verification:
+
+## Directory Structure
+
+```
+REFilterLeads/
+├── free_api/              # Free API Implementation
+│   ├── free_lead_verification.py
+│   ├── test_numverify.py
+│   ├── test_free_verification.py
+│   ├── sample_leads.csv
+│   └── sample.env
+│
+└── forewarn/             # Forewarn API Implementation
+    ├── lead_verification.py
+    ├── lead_utils.py
+    ├── mock_forewarn_api.py
+    ├── test_lead_verification.py
+    └── Project Guide for Forewarn API Integration.markdown
+```
+
+## Free API Implementation
+
+Located in the `free_api` directory, this implementation uses free APIs for lead verification:
+- Numverify for phone verification
+- NeverBounce for email verification
+- Searchbug for background checks
+
+### Setup
+1. Copy `sample.env` to `.env` and add your API keys
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run tests: 
+   - `python test_numverify.py` for API testing
+   - `python test_free_verification.py` for unit tests
+
+## Forewarn Implementation
+
+Located in the `forewarn` directory, this implementation uses the Forewarn API for comprehensive lead verification.
+
+### Setup
+1. Follow the instructions in the Project Guide
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run tests: `python test_lead_verification.py`
+
+## Requirements
+
+Both implementations require:
+- Python 3.6+
+- requests
+- python-dotenv
+- pytest (for testing)
+
+Install all requirements:
+```bash
+pip install -r requirements.txt
+```
+
 # REFilterLeads - Real Estate Lead Verification System
 
-A system for verifying real estate leads by checking if provided phone numbers match the names, using Forewarn API or a mock API for development.
-
-## Features
-
-- Verify leads automatically using name and phone number
-- Flag suspicious leads for manual review
-- Export verified and flagged leads to separate JSON files
-- Import leads from CSV or Excel files
-- Supports both a mock API (for development) and the real Forewarn API (for production)
-- Easily switch between mock and real API using environment variables
+A system for verifying real estate leads using free APIs (Numverify, NeverBounce, and Searchbug) to validate contact information and perform basic background checks.
 
 ## Setup
 
-1. Clone the repository
-2. Install dependencies:
+1. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
-3. Create a `.env` file in the project root with the following content:
-   ```
-   # Set to "true" to use the mock API, "false" to use the real Forewarn API
-   USE_MOCK_API=true
 
-   # Forewarn API credentials (update these when you get real credentials)
-   FOREWARN_API_KEY=your_forewarn_api_key
-   FOREWARN_API_URL=https://api.forewarn.com/verify
+2. Create a `.env` file in the project root with the following content:
    ```
+   # API Keys for Lead Verification
+   NUMVERIFY_API_KEY=your_numverify_api_key_here
+   NEVERBOUNCE_API_KEY=your_neverbounce_api_key_here
+   SEARCHBUG_API_KEY=your_searchbug_api_key_here
+
+   # Optional: Set to true to use mock API for testing
+   USE_MOCK_API=false
+
+   # Optional: Set the output directory for JSON files
+   OUTPUT_DIR=results
+
+   # Optional: Set the log level (DEBUG, INFO, WARNING, ERROR)
+   LOG_LEVEL=INFO
+   ```
+
+3. Get your API keys:
+   - Numverify: https://numverify.com/
+   - NeverBounce: https://www.neverbounce.com/
+   - Searchbug: https://www.searchbug.com/
 
 ## Usage
 
-### Running the Mock API Server
-
-Start the mock API server:
-
-```
-python mock_forewarn_api.py
-```
-
-This will start a local server on port 5000 that mimics the Forewarn API responses.
-
 ### Verifying Leads
 
-Run the lead verification script with built-in sample leads:
+Run the lead verification script with sample leads:
 
-```
-python lead_verification.py
-```
+```python
+from free_lead_verification import process_new_leads, save_leads_to_json
 
-The script will process the example leads, print out which ones are verified and which ones are flagged, and export them to JSON files.
-
-### Importing Leads from CSV or Excel
-
-Process leads from a CSV or Excel file:
-
-```
-python lead_utils.py sample_leads.csv
-```
-
-Options:
-- `--output` or `-o`: Specify custom output directory
-- `--no-date-folder`: Don't create a date-based folder for output
-
-Example:
-```
-python lead_utils.py sample_leads.csv --output ./my_results
-```
-
-### JSON Export Format
-
-The system exports verified and flagged leads to separate JSON files with this structure:
-
-```json
-[
-  {
-    "name": "John Doe",
-    "phone": "123-456-7890"
-  },
-  {
-    "name": "Maria Garcia",
-    "phone": "333-222-1111"
-  }
+# Your leads as (name, phone, email) tuples
+leads = [
+    ("John Doe", "1234567890", "john.doe@example.com"),
+    ("Jane Smith", "9876543210", "jane.smith@example.com")
 ]
+
+# Process leads
+verified, flagged = process_new_leads(leads)
+
+# Save results
+save_leads_to_json(verified, flagged)
 ```
 
 ### Running Tests
@@ -89,28 +117,44 @@ The system exports verified and flagged leads to separate JSON files with this s
 Run the test suite:
 
 ```
-pytest test_lead_verification.py
+python -m pytest test_free_verification.py -v
 ```
 
-## Switching to the Real API
+## Features
 
-When you receive the real Forewarn API credentials:
+- Phone number validation using Numverify
+- Email verification using NeverBounce
+- Basic background checks using Searchbug
+- Risk assessment for each lead
+- JSON export of verified and flagged leads
+- Comprehensive test coverage
 
-1. Update the `.env` file:
-   ```
-   USE_MOCK_API=false
-   FOREWARN_API_KEY=your_actual_api_key
-   FOREWARN_API_URL=the_actual_api_url
-   ```
+## Output Format
 
-2. Run the lead verification script as before - it will now use the real API.
+The system exports verified and flagged leads to separate JSON files with this structure:
 
-## Project Structure
+```json
+[
+  {
+    "name": "John Doe",
+    "phone": "123-456-7890",
+    "email": "john.doe@example.com",
+    "verification_details": {
+      "phone_verification": { ... },
+      "email_verification": { ... },
+      "background_check": { ... },
+      "verification_status": {
+        "overall_status": "verified",
+        "risk_factors": []
+      }
+    }
+  }
+]
+```
 
-- `lead_verification.py` - Main script for verifying leads
-- `mock_forewarn_api.py` - Mock API server for development
-- `lead_utils.py` - Utilities for importing leads from CSV/Excel
-- `test_lead_verification.py` - Unit tests
-- `requirements.txt` - Project dependencies
-- `.env` - Environment configuration
-- `sample_leads.csv` - Sample CSV file with leads 
+## Notes
+
+- Ensure compliance with data privacy regulations (e.g., GDPR, CCPA) when handling personal data
+- Monitor API usage to manage costs, especially for APIs with per-call pricing
+- Consider implementing rate limiting for API calls
+- Keep your API keys secure and never commit them to version control 
