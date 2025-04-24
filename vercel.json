@@ -3,17 +3,11 @@
   "builds": [
     {
       "src": "free_api/api/*.py",
-      "use": "@vercel/python",
-      "config": {
-        "distDir": "free_api/api"
-      }
+      "use": "@vercel/python"
     },
     {
       "src": "forewarn/api/*.py",
-      "use": "@vercel/python",
-      "config": {
-        "distDir": "forewarn/api"
-      }
+      "use": "@vercel/python"
     }
   ],
   "routes": [
@@ -24,9 +18,13 @@
     {
       "src": "/forewarn/(.*)",
       "dest": "/forewarn/api/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/free_api/api/index.py"
     }
   ],
   "env": {
     "PYTHONPATH": "."
   }
-} 
+}
