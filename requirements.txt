@@ -1,9 +1,11 @@
+setuptools==68.2.2
+wheel==0.41.2
+pip==23.3.1
 requests==2.31.0
 python-dotenv==1.0.0
 flask==2.3.3
 pytest==7.4.2
-pandas==2.0.3
+pandas==2.0.3; python_version < '3.12'
+numpy==1.24.3; python_version < '3.12'
 openpyxl==3.1.2
-typing-extensions==4.9.0
-numpy==1.24.3
-setuptools==68.2.2 
+typing-extensions==4.9.0 
