@@ -1,22 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "free_api/api/*.py",
-      "use": "@vercel/python",
-      "config": {
-        "pythonVersion": "3.10"
-      }
-    },
-    {
-      "src": "forewarn/api/*.py",
-      "use": "@vercel/python",
-      "config": {
-        "pythonVersion": "3.10"
-      }
-    }
-  ],
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "static",
   "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
     {
       "src": "/free-api/(.*)",
       "dest": "/free_api/api/$1"
@@ -26,12 +16,15 @@
       "dest": "/forewarn/api/$1"
     },
     {
+      "src": "/api/(.*)",
+      "dest": "/free_api/api/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/free_api/api/index.py"
+      "dest": "/index.html"
     }
   ],
   "env": {
     "PYTHONPATH": "."
-  },
-  "installCommand": "pip install --upgrade pip setuptools wheel && pip install -r requirements.txt"
+  }
 }

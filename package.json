@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Lead Verification UI",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/*.html static/",
     "watch": "tsc -w"
   },
   "dependencies": {
