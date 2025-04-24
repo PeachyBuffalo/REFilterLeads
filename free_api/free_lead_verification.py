@@ -9,18 +9,24 @@ from urllib3.exceptions import InsecureRequestWarning
 # Suppress SSL warnings
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
-# Load environment variables
-load_dotenv()
-
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+# Load environment variables from the correct path
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(env_path)
 
 # API Configuration
 NUMVERIFY_API_KEY = os.getenv("NUMVERIFY_API_KEY")
 NEVERBOUNCE_API_KEY = os.getenv("NEVERBOUNCE_API_KEY")
 MICROBILT_API_KEY = os.getenv("MICROBILT_API_KEY")
+USE_MOCK_API = os.getenv("USE_MOCK_API", "false").lower() == "true"
 
+# Debug API keys
+logger.debug(f"Numverify API Key: {'Set' if NUMVERIFY_API_KEY else 'Not Set'}")
+logger.debug(f"NeverBounce API Key: {'Set' if NEVERBOUNCE_API_KEY else 'Not Set'}")
+logger.debug(f"MicroBilt API Key: {'Set' if MICROBILT_API_KEY else 'Not Set'}")
 
 class LeadVerifier:
     def __init__(self):
@@ -71,30 +77,36 @@ class LeadVerifier:
         if not NEVERBOUNCE_API_KEY:
             return {"result": "invalid", "error": "NeverBounce API key not configured"}
             
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {NEVERBOUNCE_API_KEY}"
-        }
-        
-        data = {
-            "email": email,
-            "address_info": True,
-            "credits_info": True
+        params = {
+            "key": NEVERBOUNCE_API_KEY,
+            "email": email
         }
         
         try:
-            response = requests.post(self.neverbounce_url, headers=headers, json=data)
+            response = requests.post(self.neverbounce_url, data=params)
             response.raise_for_status()
-            return response.json()
+            result = response.json()
+            
+            if result.get("status") == "success":
+                return {
+                    "result": result.get("result", "unknown"),
+                    "flags": result.get("flags", []),
+                    "suggested_correction": result.get("suggested_correction", ""),
+                    "execution_time": result.get("execution_time", 0)
+                }
+            else:
+                logger.error(f"NeverBounce API error: {result}")
+                return {"result": "invalid", "error": result.get("message", "Unknown error")}
+                
         except requests.exceptions.RequestException as e:
             logger.error(f"Error verifying email: {e}")
             return {"result": "invalid", "error": str(e)}
 
     def check_background(self, name: str, phone: str, email: str) -> Dict:
         """Check background information using MicroBilt API"""
-        if not MICROBILT_API_KEY:
-            logger.warning("MicroBilt API key not configured")
-            return {"error": "MicroBilt API key not configured"}
+        if not MICROBILT_API_KEY or MICROBILT_API_KEY == "microbilt_api":
+            logger.info("Skipping background check - MicroBilt API key not configured")
+            return {"status": "skipped", "message": "Background check not configured"}
             
         headers = {
             "Content-Type": "application/json",
@@ -104,62 +116,46 @@ class LeadVerifier:
         data = {
             "name": name,
             "phone": phone,
-            "email": email,
-            "include_risk_factors": True,
-            "include_address_history": True
+            "email": email
         }
         
         try:
             response = requests.post(self.microbilt_url, headers=headers, json=data)
             response.raise_for_status()
-            result = response.json()
-            
-            return {
-                "name": result.get("name"),
-                "addresses": result.get("addresses", []),
-                "risk_factors": result.get("risk_factors", []),
-                "criminal_records": result.get("criminal_records", []),
-                "bankruptcies": result.get("bankruptcies", [])
-            }
+            return response.json()
         except requests.exceptions.RequestException as e:
-            logger.error(f"Error checking background with MicroBilt: {e}")
+            logger.error(f"Error checking background: {e}")
             return {"error": str(e)}
 
     def verify_lead(self, name: str, phone: str, email: str) -> Dict:
-        """Verify a lead using all three APIs"""
-        results = {
-            "phone_verification": self.verify_phone(phone),
-            "email_verification": self.verify_email(email),
-            "background_check": self.check_background(name, phone, email)
-        }
+        """Verify a lead using all available services"""
+        phone_result = self.verify_phone(phone)
+        email_result = self.verify_email(email)
+        background_result = self.check_background(name, phone, email)
         
-        # Determine overall verification status
-        phone_valid = results["phone_verification"].get("valid", False)
-        email_valid = results["email_verification"].get("result") == "valid"
-        
-        # Basic risk assessment
+        # Determine overall status
         risk_factors = []
-        if not phone_valid:
+        
+        if not phone_result.get("valid", False):
             risk_factors.append("invalid_phone")
-        if not email_valid:
+            
+        if email_result.get("result") != "valid":
             risk_factors.append("invalid_email")
+            
+        if background_result.get("error"):
+            risk_factors.append("background_check_failed")
+            
+        overall_status = "verified" if not risk_factors else "flagged"
         
-        # Add background check results
-        if "error" not in results["background_check"]:
-            background_data = results["background_check"]
-            if background_data.get("criminal_records"):
-                risk_factors.append("criminal_records")
-            if background_data.get("bankruptcies"):
-                risk_factors.append("bankruptcies")
-            if background_data.get("risk_factors"):
-                risk_factors.extend(background_data["risk_factors"])
-        
-        results["verification_status"] = {
-            "overall_status": "verified" if phone_valid and email_valid and not risk_factors else "flagged",
-            "risk_factors": risk_factors
+        return {
+            "phone_verification": phone_result,
+            "email_verification": email_result,
+            "background_check": background_result,
+            "verification_status": {
+                "overall_status": overall_status,
+                "risk_factors": risk_factors
+            }
         }
-        
-        return results
 
 def process_new_leads(leads: List[Tuple[str, str, str]]) -> Tuple[List[Dict], List[Dict]]:
     """
