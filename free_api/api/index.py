@@ -1,5 +1,10 @@
 from http.server import BaseHTTPRequestHandler
 import json
+import sys
+import os
+
+# Add parent directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from free_lead_verification import LeadVerifier
 
 class handler(BaseHTTPRequestHandler):
